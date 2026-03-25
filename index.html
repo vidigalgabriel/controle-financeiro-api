@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle Financeiro</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, select, button { margin: 5px 0; display: block; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 3px 0; }
+    hr { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>Controle Financeiro</h1>
+
+  <h2>Criar Transação</h2>
+  <input id="descricao" placeholder="Descrição">
+  <input id="valor" type="number" placeholder="Valor">
+  <select id="tipo">
+    <option value="receita">Receita</option>
+    <option value="despesa">Despesa</option>
+  </select>
+  <input id="categoria" placeholder="Categoria">
+  <input id="data" type="date">
+  <button onclick="criar()">Criar</button>
+
+  <hr>
+
+  <h2>Listar Todas</h2>
+  <button onclick="listar()">Listar</button>
+  <ul id="lista"></ul>
+
+  <hr>
+
+  <h2>Buscar por ID</h2>
+  <input id="buscarId" type="number" placeholder="ID">
+  <button onclick="buscarPorId()">Buscar</button>
+  <ul id="resultadoBusca"></ul>
+
+  <hr>
+
+  <h2>Atualizar Transação</h2>
+  <input id="updateId" type="number" placeholder="ID">
+  <input id="updateDescricao" placeholder="Descrição">
+  <input id="updateValor" type="number" placeholder="Valor">
+  <select id="updateTipo">
+    <option value="receita">Receita</option>
+    <option value="despesa">Despesa</option>
+  </select>
+  <input id="updateCategoria" placeholder="Categoria">
+  <input id="updateData" type="date">
+  <button onclick="atualizar()">Atualizar</button>
+
+  <hr>
+
+  <h2>Deletar Transação</h2>
+  <input id="deleteId" type="number" placeholder="ID">
+  <button onclick="deletar()">Deletar</button>
+
+  <script>
+    const api = 'http://localhost:3000/api/transacoes';
+
+    async function criar() {
+      const transacao = {
+        descricao: document.getElementById('descricao').value,
+        valor: parseFloat(document.getElementById('valor').value),
+        tipo: document.getElementById('tipo').value,
+        categoria: document.getElementById('categoria').value,
+        data: document.getElementById('data').value
+      };
+
+      await fetch(api, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transacao)
+      });
+
+      listar();
+    }
+
+    async function listar() {
+      const response = await fetch(api);
+      const data = await response.json();
+
+      const lista = document.getElementById('lista');
+      lista.innerHTML = '';
+      data.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = `ID ${t.id}: ${t.descricao} - ${t.valor} (${t.tipo}) [${t.categoria}] ${t.data}`;
+        lista.appendChild(li);
+      });
+    }
+
+    async function buscarPorId() {
+      const id = document.getElementById('buscarId').value;
+      const response = await fetch(`${api}/${id}`);
+      const data = await response.json();
+
+      const resultado = document.getElementById('resultadoBusca');
+      resultado.innerHTML = '';
+      if (data.id) {
+        const li = document.createElement('li');
+        li.textContent = `ID ${data.id}: ${data.descricao} - ${data.valor} (${data.tipo}) [${data.categoria}] ${data.data}`;
+        resultado.appendChild(li);
+      } else {
+        resultado.textContent = 'Transação não encontrada';
+      }
+    }
+
+    async function atualizar() {
+      const id = document.getElementById('updateId').value;
+      const transacao = {
+        descricao: document.getElementById('updateDescricao').value,
+        valor: parseFloat(document.getElementById('updateValor').value),
+        tipo: document.getElementById('updateTipo').value,
+        categoria: document.getElementById('updateCategoria').value,
+        data: document.getElementById('updateData').value
+      };
+
+      await fetch(`${api}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(transacao)
+      });
+
+      listar();
+    }
+
+    async function deletar() {
+      const id = document.getElementById('deleteId').value;
+      await fetch(`${api}/${id}`, { method: 'DELETE' });
+      listar();
+    }
+
+    listar();
+  </script>
+</body>
+</html>
