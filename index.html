@@ -62,69 +62,126 @@
     const apiBase = '/api/transacoes';
 
     async function criar() {
-      const transacao = {
-        descricao: document.getElementById('descricao').value,
-        valor: parseFloat(document.getElementById('valor').value),
-        tipo: document.getElementById('tipo').value,
-        categoria: document.getElementById('categoria').value,
-        data: document.getElementById('data').value
-      };
-      await fetch(apiBase, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(transacao)
-      });
-      listar();
+      const descricao = document.getElementById('descricao').value;
+      const valor = parseFloat(document.getElementById('valor').value);
+      const tipo = document.getElementById('tipo').value;
+      const categoria = document.getElementById('categoria').value;
+      const data = document.getElementById('data').value;
+      if (!descricao || isNaN(valor) || !tipo || !categoria || !data) {
+        alert('Preencha todos os campos corretamente.');
+        return;
+      }
+      const transacao = { descricao, valor, tipo, categoria, data };
+      try {
+        const response = await fetch(apiBase, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(transacao)
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          alert(err.erro || 'Erro ao criar transação');
+          return;
+        }
+        listar();
+      } catch (e) {
+        alert('Erro de conexão');
+      }
     }
 
     async function listar() {
-      const response = await fetch(apiBase);
-      const data = await response.json();
-      const lista = document.getElementById('lista');
-      lista.innerHTML = '';
-      data.forEach(t => {
-        const li = document.createElement('li');
-        li.textContent = `ID ${t.id}: ${t.descricao} - ${t.valor} (${t.tipo}) [${t.categoria}] ${t.data}`;
-        lista.appendChild(li);
-      });
+      try {
+        const response = await fetch(apiBase);
+        const data = await response.json();
+        const lista = document.getElementById('lista');
+        lista.innerHTML = '';
+        if (Array.isArray(data)) {
+          data.forEach(t => {
+            const li = document.createElement('li');
+            li.textContent = `ID ${t.id}: ${t.descricao} - ${t.valor} (${t.tipo}) [${t.categoria}] ${t.data}`;
+            lista.appendChild(li);
+          });
+        } else if (data.erro) {
+          lista.textContent = 'Erro: ' + data.erro;
+        } else {
+          lista.textContent = 'Erro desconhecido';
+        }
+      } catch (e) {
+        document.getElementById('lista').textContent = 'Erro de conexão';
+      }
     }
 
     async function buscarPorId() {
       const id = document.getElementById('buscarId').value;
-      const response = await fetch(`${apiBase}/${id}`);
-      const data = await response.json();
-      const resultado = document.getElementById('resultadoBusca');
-      resultado.innerHTML = '';
-      if (data.id) {
-        const li = document.createElement('li');
-        li.textContent = `ID ${data.id}: ${data.descricao} - ${data.valor} (${data.tipo}) [${data.categoria}] ${data.data}`;
-        resultado.appendChild(li);
-      } else {
-        resultado.textContent = 'Transação não encontrada';
+      if (!id) {
+        alert('Informe um ID válido');
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBase}/${id}`);
+        const data = await response.json();
+        const resultado = document.getElementById('resultadoBusca');
+        resultado.innerHTML = '';
+        if (data.id) {
+          const li = document.createElement('li');
+          li.textContent = `ID ${data.id}: ${data.descricao} - ${data.valor} (${data.tipo}) [${data.categoria}] ${data.data}`;
+          resultado.appendChild(li);
+        } else if (data.erro) {
+          resultado.textContent = 'Erro: ' + data.erro;
+        } else {
+          resultado.textContent = 'Transação não encontrada';
+        }
+      } catch (e) {
+        document.getElementById('resultadoBusca').textContent = 'Erro de conexão';
       }
     }
 
     async function atualizar() {
       const id = document.getElementById('updateId').value;
-      const transacao = {
-        descricao: document.getElementById('updateDescricao').value,
-        valor: parseFloat(document.getElementById('updateValor').value),
-        tipo: document.getElementById('updateTipo').value,
-        categoria: document.getElementById('updateCategoria').value,
-        data: document.getElementById('updateData').value
-      };
-      await fetch(`${apiBase}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(transacao)
-      });
-      listar();
+      const descricao = document.getElementById('updateDescricao').value;
+      const valor = parseFloat(document.getElementById('updateValor').value);
+      const tipo = document.getElementById('updateTipo').value;
+      const categoria = document.getElementById('updateCategoria').value;
+      const data = document.getElementById('updateData').value;
+      if (!id || !descricao || isNaN(valor) || !tipo || !categoria || !data) {
+        alert('Preencha todos os campos corretamente.');
+        return;
+      }
+      const transacao = { descricao, valor, tipo, categoria, data };
+      try {
+        const response = await fetch(`${apiBase}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(transacao)
+        });
+        if (!response.ok) {
+          const err = await response.json();
+          alert(err.erro || 'Erro ao atualizar transação');
+          return;
+        }
+        listar();
+      } catch (e) {
+        alert('Erro de conexão');
+      }
     }
 
     async function deletar() {
       const id = document.getElementById('deleteId').value;
-      await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
-      listar();
+      if (!id) {
+        alert('Informe um ID válido');
+        return;
+      }
+      try {
+        const response = await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
+        if (!response.ok) {
+          const err = await response.json();
+          alert(err.erro || 'Erro ao deletar transação');
+          return;
+        }
+        listar();
+      } catch (e) {
+        alert('Erro de conexão');
+      }
     }
 
     listar();
