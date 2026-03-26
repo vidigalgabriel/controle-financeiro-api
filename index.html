@@ -1,190 +1,63 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Controle Financeiro</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    input, select, button { margin: 5px 0; display: block; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 3px 0; }
-    hr { margin: 20px 0; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Controle Financeiro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        input,
+        select,
+        button {
+            margin: 5px 0;
+            display: block;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 3px 0;
+        }
+
+        hr {
+            margin: 20px 0;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>Controle Financeiro</h1>
-
-  <h2>Criar Transação</h2>
-  <input id="descricao" placeholder="Descrição">
-  <input id="valor" type="number" placeholder="Valor">
-  <select id="tipo">
-    <option value="receita">Receita</option>
-    <option value="despesa">Despesa</option>
-  </select>
-  <input id="categoria" placeholder="Categoria">
-  <input id="data" type="date">
-  <button onclick="criar()">Criar</button>
-
-  <hr>
-
-  <h2>Listar Todas</h2>
-  <button onclick="listar()">Listar</button>
-  <ul id="lista"></ul>
-
-  <hr>
-
-  <h2>Buscar por ID</h2>
-  <input id="buscarId" type="number" placeholder="ID">
-  <button onclick="buscarPorId()">Buscar</button>
-  <ul id="resultadoBusca"></ul>
-
-  <hr>
-
-  <h2>Atualizar Transação</h2>
-  <input id="updateId" type="number" placeholder="ID">
-  <input id="updateDescricao" placeholder="Descrição">
-  <input id="updateValor" type="number" placeholder="Valor">
-  <select id="updateTipo">
-    <option value="receita">Receita</option>
-    <option value="despesa">Despesa</option>
-  </select>
-  <input id="updateCategoria" placeholder="Categoria">
-  <input id="updateData" type="date">
-  <button onclick="atualizar()">Atualizar</button>
-
-  <hr>
-
-  <h2>Deletar Transação</h2>
-  <input id="deleteId" type="number" placeholder="ID">
-  <button onclick="deletar()">Deletar</button>
-
-  <script>
-    const apiBase = '/api/transacoes';
-
-    async function criar() {
-      const descricao = document.getElementById('descricao').value;
-      const valor = parseFloat(document.getElementById('valor').value);
-      const tipo = document.getElementById('tipo').value;
-      const categoria = document.getElementById('categoria').value;
-      const data = document.getElementById('data').value;
-      if (!descricao || isNaN(valor) || !tipo || !categoria || !data) {
-        alert('Preencha todos os campos corretamente.');
-        return;
-      }
-      const transacao = { descricao, valor, tipo, categoria, data };
-      try {
-        const response = await fetch(apiBase, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(transacao)
-        });
-        if (!response.ok) {
-          const err = await response.json();
-          alert(err.erro || 'Erro ao criar transação');
-          return;
-        }
-        listar();
-      } catch (e) {
-        alert('Erro de conexão');
-      }
-    }
-
-    async function listar() {
-      try {
-        const response = await fetch(apiBase);
-        const data = await response.json();
-        const lista = document.getElementById('lista');
-        lista.innerHTML = '';
-        if (Array.isArray(data)) {
-          data.forEach(t => {
-            const li = document.createElement('li');
-            li.textContent = `ID ${t.id}: ${t.descricao} - ${t.valor} (${t.tipo}) [${t.categoria}] ${t.data}`;
-            lista.appendChild(li);
-          });
-        } else if (data.erro) {
-          lista.textContent = 'Erro: ' + data.erro;
-        } else {
-          lista.textContent = 'Erro desconhecido';
-        }
-      } catch (e) {
-        document.getElementById('lista').textContent = 'Erro de conexão';
-      }
-    }
-
-    async function buscarPorId() {
-      const id = document.getElementById('buscarId').value;
-      if (!id) {
-        alert('Informe um ID válido');
-        return;
-      }
-      try {
-        const response = await fetch(`${apiBase}/${id}`);
-        const data = await response.json();
-        const resultado = document.getElementById('resultadoBusca');
-        resultado.innerHTML = '';
-        if (data.id) {
-          const li = document.createElement('li');
-          li.textContent = `ID ${data.id}: ${data.descricao} - ${data.valor} (${data.tipo}) [${data.categoria}] ${data.data}`;
-          resultado.appendChild(li);
-        } else if (data.erro) {
-          resultado.textContent = 'Erro: ' + data.erro;
-        } else {
-          resultado.textContent = 'Transação não encontrada';
-        }
-      } catch (e) {
-        document.getElementById('resultadoBusca').textContent = 'Erro de conexão';
-      }
-    }
-
-    async function atualizar() {
-      const id = document.getElementById('updateId').value;
-      const descricao = document.getElementById('updateDescricao').value;
-      const valor = parseFloat(document.getElementById('updateValor').value);
-      const tipo = document.getElementById('updateTipo').value;
-      const categoria = document.getElementById('updateCategoria').value;
-      const data = document.getElementById('updateData').value;
-      if (!id || !descricao || isNaN(valor) || !tipo || !categoria || !data) {
-        alert('Preencha todos os campos corretamente.');
-        return;
-      }
-      const transacao = { descricao, valor, tipo, categoria, data };
-      try {
-        const response = await fetch(`${apiBase}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(transacao)
-        });
-        if (!response.ok) {
-          const err = await response.json();
-          alert(err.erro || 'Erro ao atualizar transação');
-          return;
-        }
-        listar();
-      } catch (e) {
-        alert('Erro de conexão');
-      }
-    }
-
-    async function deletar() {
-      const id = document.getElementById('deleteId').value;
-      if (!id) {
-        alert('Informe um ID válido');
-        return;
-      }
-      try {
-        const response = await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
-        if (!response.ok) {
-          const err = await response.json();
-          alert(err.erro || 'Erro ao deletar transação');
-          return;
-        }
-        listar();
-      } catch (e) {
-        alert('Erro de conexão');
-      }
-    }
-
-    listar();
-  </script>
+    <h1>Controle Financeiro</h1>
+    <h2>Criar Transação</h2> <input id="descricao" placeholder="Descrição"> <input id="valor" type="number"
+        placeholder="Valor"> <select id="tipo">
+        <option value="receita">Receita</option>
+        <option value="despesa">Despesa</option>
+    </select> <input id="categoria" placeholder="Categoria"> <input id="data" type="date"> <button
+        onclick="criar()">Criar</button>
+    <hr>
+    <h2>Listar Todas</h2> <button onclick="listar()">Listar</button>
+    <ul id="lista"></ul>
+    <hr>
+    <h2>Buscar por ID</h2> <input id="buscarId" type="number" placeholder="ID"> <button
+        onclick="buscarPorId()">Buscar</button>
+    <ul id="resultadoBusca"></ul>
+    <hr>
+    <h2>Atualizar Transação</h2> <input id="updateId" type="number" placeholder="ID"> <input id="updateDescricao"
+        placeholder="Descrição"> <input id="updateValor" type="number" placeholder="Valor"> <select id="updateTipo">
+        <option value="receita">Receita</option>
+        <option value="despesa">Despesa</option>
+    </select> <input id="updateCategoria" placeholder="Categoria"> <input id="updateData" type="date"> <button
+        onclick="atualizar()">Atualizar</button>
+    <hr>
+    <h2>Deletar Transação</h2> <input id="deleteId" type="number" placeholder="ID"> <button
+        onclick="deletar()">Deletar</button>
+    <script> const apiBase = '/api/transacoes'; async function criar() { const descricao = document.getElementById('descricao').value || ''; const valorRaw = document.getElementById('valor').value; const valor = valorRaw ? parseFloat(valorRaw) : 0; const tipo = document.getElementById('tipo').value || ''; const categoria = document.getElementById('categoria').value || ''; const data = document.getElementById('data').value || new Date().toISOString().slice(0, 10); if (!descricao || valor <= 0 || !tipo || !categoria || !data) { alert('Preencha todos os campos corretamente.'); return; } const transacao = { descricao, valor, tipo, categoria, data }; try { const response = await fetch(apiBase, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transacao) }); if (!response.ok) { const err = await response.json(); alert(err.erro || 'Erro ao criar transação'); return; } listar(); } catch (e) { alert('Erro de conexão'); } } async function listar() { try { const response = await fetch(apiBase); const data = await response.json(); const lista = document.getElementById('lista'); lista.innerHTML = ''; if (Array.isArray(data)) { data.forEach(t => { const li = document.createElement('li'); li.textContent = `ID ${t.id}: ${t.descricao} - ${t.valor} (${t.tipo}) [${t.categoria}] ${t.data}`; lista.appendChild(li); }); } else if (data.erro) { lista.textContent = 'Erro: ' + data.erro; } else { lista.textContent = 'Erro desconhecido'; } } catch (e) { document.getElementById('lista').textContent = 'Erro de conexão'; } } async function buscarPorId() { const id = document.getElementById('buscarId').value; if (!id) { alert('Informe um ID válido'); return; } try { const response = await fetch(`${apiBase}/${id}`); const data = await response.json(); const resultado = document.getElementById('resultadoBusca'); resultado.innerHTML = ''; if (data.id) { const li = document.createElement('li'); li.textContent = `ID ${data.id}: ${data.descricao} - ${data.valor} (${data.tipo}) [${data.categoria}] ${data.data}`; resultado.appendChild(li); } else if (data.erro) { resultado.textContent = 'Erro: ' + data.erro; } else { resultado.textContent = 'Transação não encontrada'; } } catch (e) { document.getElementById('resultadoBusca').textContent = 'Erro de conexão'; } } async function atualizar() { const id = document.getElementById('updateId').value; const descricao = document.getElementById('updateDescricao').value || ''; const valorRaw = document.getElementById('updateValor').value; const valor = valorRaw ? parseFloat(valorRaw) : 0; const tipo = document.getElementById('updateTipo').value || ''; const categoria = document.getElementById('updateCategoria').value || ''; const data = document.getElementById('updateData').value || new Date().toISOString().slice(0, 10); if (!id || !descricao || valor <= 0 || !tipo || !categoria || !data) { alert('Preencha todos os campos corretamente.'); return; } const transacao = { descricao, valor, tipo, categoria, data }; try { const response = await fetch(`${apiBase}/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transacao) }); if (!response.ok) { const err = await response.json(); alert(err.erro || 'Erro ao atualizar transação'); return; } listar(); } catch (e) { alert('Erro de conexão'); } } async function deletar() { const id = document.getElementById('deleteId').value; if (!id) { alert('Informe um ID válido'); return; } try { const response = await fetch(`${apiBase}/${id}`, { method: 'DELETE' }); if (!response.ok) { const err = await response.json(); alert(err.erro || 'Erro ao deletar transação'); return; } listar(); } catch (e) { alert('Erro de conexão'); } } listar(); </script>
 </body>
+
 </html>
