@@ -59,7 +59,7 @@
   <button onclick="deletar()">Deletar</button>
 
   <script>
-    const api = 'https://appfinanceiro.onrender.com/api/transacoes';
+    const apiBase = '/api/transacoes';
 
     async function criar() {
       const transacao = {
@@ -69,7 +69,7 @@
         categoria: document.getElementById('categoria').value,
         data: document.getElementById('data').value
       };
-      await fetch(api, {
+      await fetch(apiBase, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transacao)
@@ -78,7 +78,7 @@
     }
 
     async function listar() {
-      const response = await fetch(api);
+      const response = await fetch(apiBase);
       const data = await response.json();
       const lista = document.getElementById('lista');
       lista.innerHTML = '';
@@ -91,7 +91,7 @@
 
     async function buscarPorId() {
       const id = document.getElementById('buscarId').value;
-      const response = await fetch(`${api}/${id}`);
+      const response = await fetch(`${apiBase}/${id}`);
       const data = await response.json();
       const resultado = document.getElementById('resultadoBusca');
       resultado.innerHTML = '';
@@ -113,7 +113,7 @@
         categoria: document.getElementById('updateCategoria').value,
         data: document.getElementById('updateData').value
       };
-      await fetch(`${api}/${id}`, {
+      await fetch(`${apiBase}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transacao)
@@ -123,7 +123,7 @@
 
     async function deletar() {
       const id = document.getElementById('deleteId').value;
-      await fetch(`${api}/${id}`, { method: 'DELETE' });
+      await fetch(`${apiBase}/${id}`, { method: 'DELETE' });
       listar();
     }
 
