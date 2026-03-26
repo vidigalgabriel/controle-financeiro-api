@@ -1,46 +1,40 @@
 const transacaoService = require('../services/transacaoService');
 
 class TransacaoController {
-  async criar(req, res) {
+  criar(req, res) {
     try {
       const { descricao, valor, tipo, categoria, data } = req.body;
       if (!descricao || valor === undefined || !tipo || !categoria || !data) {
         return res.status(400).json({ erro: 'Campos obrigatórios faltando' });
       }
-      const transacao = await transacaoService.criar(req.body);
+      const transacao = transacaoService.criar(req.body);
       return res.status(201).json(transacao);
     } catch (error) {
       return res.status(500).json({ erro: error.message });
     }
   }
 
-  async listarTodas(req, res) {
+  listarTodas(req, res) {
     try {
-      const transacoes = await transacaoService.listarTodas();
+      const transacoes = transacaoService.listarTodas();
       return res.status(200).json(Array.isArray(transacoes) ? transacoes : []);
-    } catch (error) {
+    } catch {
       return res.status(200).json([]);
     }
   }
 
-  async buscarPorId(req, res) {
+  buscarPorId(req, res) {
     try {
-      const { id } = req.params;
-      const transacao = await transacaoService.buscarPorId(id);
+      const transacao = transacaoService.buscarPorId(req.params.id);
       return res.status(200).json(transacao || {});
-    } catch (error) {
+    } catch {
       return res.status(404).json({});
     }
   }
 
-  async atualizar(req, res) {
+  atualizar(req, res) {
     try {
-      const { id } = req.params;
-      const { descricao, valor, tipo, categoria, data } = req.body;
-      if (!descricao || valor === undefined || !tipo || !categoria || !data) {
-        return res.status(400).json({ erro: 'Campos obrigatórios faltando' });
-      }
-      const transacao = await transacaoService.atualizar(id, req.body);
+      const transacao = transacaoService.atualizar(req.params.id, req.body);
       return res.status(200).json(transacao);
     } catch (error) {
       const status = error.message === 'Transação não encontrada' ? 404 : 400;
@@ -48,39 +42,38 @@ class TransacaoController {
     }
   }
 
-  async deletar(req, res) {
+  deletar(req, res) {
     try {
-      const { id } = req.params;
-      const resultado = await transacaoService.deletar(id);
+      const resultado = transacaoService.deletar(req.params.id);
       return res.status(200).json(resultado);
-    } catch (error) {
+    } catch {
       return res.status(404).json({});
     }
   }
 
-  async obterResumo(req, res) {
+  obterResumo(req, res) {
     try {
-      const resumo = await transacaoService.obterResumo();
+      const resumo = transacaoService.obterResumo();
       return res.status(200).json(resumo);
-    } catch (error) {
+    } catch {
       return res.status(200).json({});
     }
   }
 
-  async obterTotalPorCategoria(req, res) {
+  obterTotalPorCategoria(req, res) {
     try {
-      const totais = await transacaoService.obterTotalPorCategoria();
+      const totais = transacaoService.obterTotalPorCategoria();
       return res.status(200).json(totais);
-    } catch (error) {
+    } catch {
       return res.status(200).json([]);
     }
   }
 
-  async obterTotalPorMes(req, res) {
+  obterTotalPorMes(req, res) {
     try {
-      const totais = await transacaoService.obterTotalPorMes();
+      const totais = transacaoService.obterTotalPorMes();
       return res.status(200).json(totais);
-    } catch (error) {
+    } catch {
       return res.status(200).json([]);
     }
   }
