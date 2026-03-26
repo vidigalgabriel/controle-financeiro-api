@@ -13,7 +13,7 @@ class TransacaoController {
   async listarTodas(req, res) {
     try {
       const transacoes = await transacaoService.listarTodas();
-      return res.status(200).json(transacoes);
+      return res.status(200).json(Array.isArray(transacoes) ? transacoes : []);
     } catch (error) {
       return res.status(500).json({ erro: error.message });
     }
@@ -23,7 +23,7 @@ class TransacaoController {
     try {
       const { id } = req.params;
       const transacao = await transacaoService.buscarPorId(id);
-      return res.status(200).json(transacao);
+      return res.status(200).json(transacao || {});
     } catch (error) {
       return res.status(404).json({ erro: error.message });
     }
