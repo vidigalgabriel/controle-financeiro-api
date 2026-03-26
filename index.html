@@ -59,7 +59,7 @@
   <button onclick="deletar()">Deletar</button>
 
   <script>
-    const api = 'http://localhost:3000/api/transacoes';
+    const api = 'https://appfinanceiro.onrender.com/api/transacoes';
 
     async function criar() {
       const transacao = {
@@ -69,20 +69,17 @@
         categoria: document.getElementById('categoria').value,
         data: document.getElementById('data').value
       };
-
       await fetch(api, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transacao)
       });
-
       listar();
     }
 
     async function listar() {
       const response = await fetch(api);
       const data = await response.json();
-
       const lista = document.getElementById('lista');
       lista.innerHTML = '';
       data.forEach(t => {
@@ -96,7 +93,6 @@
       const id = document.getElementById('buscarId').value;
       const response = await fetch(`${api}/${id}`);
       const data = await response.json();
-
       const resultado = document.getElementById('resultadoBusca');
       resultado.innerHTML = '';
       if (data.id) {
@@ -117,13 +113,11 @@
         categoria: document.getElementById('updateCategoria').value,
         data: document.getElementById('updateData').value
       };
-
       await fetch(`${api}/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(transacao)
       });
-
       listar();
     }
 
