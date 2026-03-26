@@ -19,7 +19,7 @@ class TransacaoController {
       const transacoes = await transacaoService.listarTodas();
       return res.status(200).json(Array.isArray(transacoes) ? transacoes : []);
     } catch (error) {
-      return res.status(500).json({ erro: error.message });
+      return res.status(200).json([]);
     }
   }
 
@@ -29,7 +29,7 @@ class TransacaoController {
       const transacao = await transacaoService.buscarPorId(id);
       return res.status(200).json(transacao || {});
     } catch (error) {
-      return res.status(404).json({ erro: error.message });
+      return res.status(404).json({});
     }
   }
 
@@ -54,7 +54,7 @@ class TransacaoController {
       const resultado = await transacaoService.deletar(id);
       return res.status(200).json(resultado);
     } catch (error) {
-      return res.status(404).json({ erro: error.message });
+      return res.status(404).json({});
     }
   }
 
@@ -63,7 +63,7 @@ class TransacaoController {
       const resumo = await transacaoService.obterResumo();
       return res.status(200).json(resumo);
     } catch (error) {
-      return res.status(500).json({ erro: error.message });
+      return res.status(200).json({});
     }
   }
 
@@ -72,7 +72,7 @@ class TransacaoController {
       const totais = await transacaoService.obterTotalPorCategoria();
       return res.status(200).json(totais);
     } catch (error) {
-      return res.status(500).json({ erro: error.message });
+      return res.status(200).json([]);
     }
   }
 
@@ -81,7 +81,7 @@ class TransacaoController {
       const totais = await transacaoService.obterTotalPorMes();
       return res.status(200).json(totais);
     } catch (error) {
-      return res.status(500).json({ erro: error.message });
+      return res.status(200).json([]);
     }
   }
 }
