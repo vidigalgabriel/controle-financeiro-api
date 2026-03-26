@@ -1,20 +1,17 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
-const transacaoRoutes = require('./src/routes/transacaoRoutes');
+const transacoesRouter = require('./routes/transacoes'); // sua rota da API
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(cors());
 app.use(express.json());
+app.use('/api/transacoes', transacoesRouter);
 
-app.use('/api', transacaoRoutes);
+// Serve os arquivos do React
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
