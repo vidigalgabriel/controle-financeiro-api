@@ -1,14 +1,15 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const transacoesRouter = require('./src/routes/transacaoRoutes');
 
 const app = express();
 app.use(express.json());
 app.use('/api/transacoes', transacoesRouter);
 
-const buildPath = path.resolve(__dirname, '../client/build');
+let buildPath = path.resolve(__dirname, '../client/build');
 
-if (!require('fs').existsSync(buildPath)) {
+if (!fs.existsSync(buildPath)) {
   buildPath = path.resolve(__dirname, './client/build');
 }
 
