@@ -8,6 +8,10 @@ app.use('/api/transacoes', transacoesRouter);
 
 const buildPath = path.resolve(__dirname, '../client/build');
 
+if (!require('fs').existsSync(buildPath)) {
+  buildPath = path.resolve(__dirname, './client/build');
+}
+
 app.use(express.static(buildPath));
 
 app.get('*', (req, res) => {
