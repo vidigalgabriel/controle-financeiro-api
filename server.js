@@ -1,12 +1,12 @@
 const express = require('express');
 const path = require('path');
-const transacoesRouter = require('./routes/transacoes'); // sua rota da API
+const transacoesRouter = require('./routes/transacaoRoutes');
 
 const app = express();
 app.use(express.json());
 app.use('/api/transacoes', transacoesRouter);
 
-// Serve os arquivos do React
+
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.get('*', (req, res) => {
