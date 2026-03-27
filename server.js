@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const transacoesRouter = require('./routes/transacaoRoutes');
+const transacoesRouter = require('./src/routes/transacaoRoutes');
 
 const app = express();
 app.use(express.json());
